@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loudness Meter — ITU-R BS.1770-4 / EBU R128</title>
+<meta name="description" content="Precision loudness meter: LUFS integrated, momentary, short-term, LRA, true peak, PLR/PSR. File analysis and live input.">
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3"  y="12" width="3" height="8"  rx="1.5" opacity=".45"/>
+        <rect x="9"  y="7"  width="3" height="18" rx="1.5" opacity=".7"/>
+        <rect x="15" y="2"  width="3" height="28" rx="1.5"/>
+        <rect x="21" y="9"  width="3" height="14" rx="1.5" opacity=".7"/>
+        <rect x="27" y="13" width="3" height="6"  rx="1.5" opacity=".45"/>
+      </svg>
+      <div class="brand-text">
+        <h1>LOUDNESS METER</h1>
+        <p>ITU-R BS.1770-4 · EBU R128 · true peak</p>
+      </div>
+    </div>
+
+    <div class="target-group">
+      <label for="targetSelect">TARGET</label>
+      <div class="select-wrap">
+        <select id="targetSelect" aria-label="Loudness target"></select>
+      </div>
+      <span class="verdict is-idle" id="verdict">—</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btnOpen" title="Open an audio file (O)">Open audio</button>
+      <div class="live-wrap">
+        <button class="btn" id="btnLive" title="Choose an input source">Live input<span class="caret">▾</span></button>
+        <div class="live-menu" id="liveMenu" hidden>
+          <button type="button" data-src="mic">Microphone / line input</button>
+          <button type="button" data-src="system">System audio — what the PC plays</button>
+          <button type="button" data-src="stop" id="liveStop" hidden>Stop measuring</button>
+        </div>
+      </div>
+      <button class="btn" id="btnDemo" title="Load a synthetic reference programme">Demo</button>
+      <button class="btn" id="btnFix" title="Normalise to the target and export a WAV (F)">Auto-fix</button>
+      <button class="btn" id="btnMeta" title="Edit or strip file metadata (M)">Metadata</button>
+      <span class="divider"></span>
+      <button class="btn btn-icon" id="btnReset" title="Reset measurement (R)" aria-label="Reset">&#8635;</button>
+      <button class="btn btn-icon" id="btnExport" title="Export report (E)" aria-label="Export report">&#10515;</button>
+      <button class="btn btn-icon" id="btnHelp" title="Reference &amp; shortcuts (?)" aria-label="Help">?</button>
+    </div>
+  </header>
+
+  <main class="meter">
+    <section class="panel ruler-panel">
+      <canvas id="rulerCanvas"></canvas>
+    </section>
+
+    <section class="panel readouts">
+      <div class="hero" id="heroCard">
+        <div class="hero-head">
+          <span class="hero-label">INTEGRATED</span>
+          <button class="unit-toggle" id="unitToggle" title="Switch LUFS / LKFS">LUFS</button>
+        </div>
+        <div class="hero-value"><span id="vIntegrated">--.-</span></div>
+        <div class="hero-foot">
+          <span id="targetLine">no target</span>
+          <span class="hero-gate" id="gateLine">gate —</span>
+        </div>
+      </div>
+
+      <div class="cells">
+        <div class="cell" data-metric="m">
+          <span class="k"><i class="swatch" style="--c:var(--m)"></i>MOMENTARY</span>
+          <span class="v" id="vM">--.-</span><span class="u">LUFS</span>
+        </div>
+        <div class="cell" data-metric="s">
+          <span class="k"><i class="swatch" style="--c:var(--s)"></i>SHORT-TERM</span>
+          <span class="v" id="vS">--.-</span><span class="u">LUFS</span>
+        </div>
+        <div class="cell" data-metric="lra">
+          <span class="k">LRA</span>
+          <span class="v" id="vLra">--.-</span><span class="u">LU</span>
+        </div>
+        <div class="cell" data-metric="plr">
+          <span class="k">PLR</span>
+          <span class="v" id="vPlr">--.-</span><span class="u">LU</span>
+        </div>
+        <div class="cell" data-metric="maxm">
+          <span class="k">MAX M</span>
+          <span class="v" id="vMaxM">--.-</span><span class="u">LUFS</span>
+        </div>
+        <div class="cell" data-metric="maxs">
+          <span class="k">MAX S</span>
+          <span class="v" id="vMaxS">--.-</span><span class="u">LUFS</span>
+        </div>
+        <div class="cell cell-tp" data-metric="tp">
+          <span class="k">TRUE PEAK</span>
+          <span class="v" id="vTp">--.-</span><span class="u">dBTP</span>
+        </div>
+        <div class="cell" data-metric="psr">
+          <span class="k">PSR</span>
+          <span class="v" id="vPsr">--.-</span><span class="u">LU</span>
+        </div>
+      </div>
+
+      <div class="readout-foot">
+        <span id="layoutChip" class="chip">—</span>
+        <span id="rateChip" class="chip">—</span>
+        <span id="blocksChip" class="chip">0 blocks</span>
+      </div>
+    </section>
+
+    <section class="panel hist-panel">
+      <div class="panel-head">
+        <span class="panel-title">LOUDNESS DISTRIBUTION</span>
+        <span class="legend">
+          <i class="swatch" style="--c:var(--m)"></i>momentary
+          <i class="swatch" style="--c:var(--s)"></i>short-term
+        </span>
+      </div>
+      <canvas id="histCanvas"></canvas>
+    </section>
+  </main>
+
+  <section class="panel timeline">
+    <div class="timeline-head">
+      <div class="file-line">
+        <span class="source-dot" id="sourceDot"></span>
+        <span class="file-name" id="fileName">No audio loaded</span>
+        <span class="file-meta" id="fileMeta">drop a file anywhere, or press Open audio</span>
+        <span class="silent-chip" id="silentChip" hidden>silent</span>
+      </div>
+      <div class="window-group" id="windowGroup">
+        <button class="win-btn is-active" data-win="0">ALL</button>
+        <button class="win-btn" data-win="10">10 s</button>
+        <button class="win-btn" data-win="30">30 s</button>
+      </div>
+    </div>
+    <div class="graph-wrap">
+      <canvas id="graphCanvas"></canvas>
+      <div class="progress" id="progress"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+  </section>
+
+  <footer class="transport">
+    <button class="play-btn" id="btnPlay" aria-label="Play / pause" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>
+    </button>
+    <span class="time" id="timeLabel">0:00 / 0:00</span>
+    <span class="sel-chip" id="selChip" hidden></span>
+    <span class="spacer"></span>
+    <span class="status" id="statusLabel">Ready</span>
+  </footer>
+</div>
+
+<input type="file" id="fileInput" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.aac,.opus" hidden>
+
+<div class="modal" id="fixModal" hidden>
+  <div class="modal-card fix-card">
+    <header>
+      <h2>AUTO-FIX TO TARGET</h2>
+      <button class="btn btn-icon" id="btnCloseFix" aria-label="Close">&times;</button>
+    </header>
+    <div class="modal-body">
+      <div class="fix-head">
+        <span id="fixTargetLabel">—</span>
+        <span class="fix-controls">
+          <label class="fix-ceil">ceiling <input id="fixCeil" type="text" inputmode="decimal" value="-1.0" aria-label="True peak ceiling"> dBTP</label>
+          <label class="fix-ceil">depth
+            <select id="fixBits" aria-label="Export bit depth">
+              <option value="16">16-bit</option>
+              <option value="24">24-bit</option>
+              <option value="32">32-bit float</option>
+            </select>
+          </label>
+        </span>
+      </div>
+
+      <table class="fix-table">
+        <thead><tr><th>measurement</th><th>now</th><th>after</th></tr></thead>
+        <tbody>
+          <tr><td>Integrated</td><td id="fixNowI">—</td><td id="fixAfterI">—</td></tr>
+          <tr><td>True peak</td><td id="fixNowTP">—</td><td id="fixAfterTP">—</td></tr>
+          <tr><td>Loudness range</td><td id="fixNowLRA">—</td><td id="fixAfterLRA">—</td></tr>
+          <tr><td>PLR</td><td id="fixNowPLR">—</td><td id="fixAfterPLR">—</td></tr>
+        </tbody>
+      </table>
+
+      <p class="fix-plan" id="fixPlan">—</p>
+      <div class="fix-bar" id="fixBar" hidden><div id="fixBarFill"></div></div>
+
+      <div class="fix-actions">
+        <button class="btn btn-primary" id="btnDoFix">Fix &amp; measure</button>
+        <button class="btn" id="btnSaveFix" disabled>Download 24-bit WAV</button>
+      </div>
+
+      <p class="fine">Gain first, then a 3 ms look-ahead limiter at the ceiling; the “after” column is measured
+      with the same engine, not predicted. Output is WAV at 48 kHz, in the bit depth you pick. Limiting cannot add dynamics back,
+      and clipping already in the file stays there.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="metaModal" hidden>
+  <div class="modal-card meta-card">
+    <header>
+      <h2>METADATA</h2>
+      <button class="btn btn-icon" id="btnCloseMeta" aria-label="Close">&times;</button>
+    </header>
+    <div class="modal-body">
+      <div class="meta-head">
+        <span class="meta-name" id="metaName">—</span>
+        <span class="meta-badge" id="metaFormat">WAV</span>
+        <span class="meta-badge" id="metaSize">0 MB</span>
+        <span class="meta-badge" id="metaArt" hidden>cover art</span>
+      </div>
+
+      <div class="meta-body">
+        <div class="meta-edit">
+          <div class="meta-title">EDIT TAGS</div>
+          <div class="meta-form" id="metaForm"></div>
+        </div>
+        <div class="meta-side">
+          <div class="meta-title">IN THE FILE</div>
+          <div class="meta-found" id="metaFound"></div>
+        </div>
+      </div>
+
+      <p class="meta-note" id="metaNote"></p>
+
+      <div class="fix-actions">
+        <button class="btn btn-primary" id="metaSave">Save copy</button>
+        <button class="btn" id="metaStrip">Strip all metadata</button>
+      </div>
+      <p class="fine">Only the container's metadata is rewritten — the audio payload is copied byte for byte,
+      so a WAV stays sample-identical and an MP3/FLAC keeps its original frames. “Strip all” removes
+      BWF/bext, iXML, XMP, ID3, APE and cover art.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="modal-card">
+    <header>
+      <h2>How this meter works</h2>
+      <button class="btn btn-icon" id="btnCloseHelp" aria-label="Close">&times;</button>
+    </header>
+    <div class="modal-body">
+      <div class="doc-grid">
+        <div><b>M — Momentary</b><span>400 ms window, 100 ms hop. What you feel moment to moment.</span></div>
+        <div><b>S — Short-term</b><span>3 s window. Loudness of a phrase or a scene.</span></div>
+        <div><b>I — Integrated</b><span>Gated average over everything measured: −70 LUFS absolute gate, then −10 LU relative gate (BS.1770-4).</span></div>
+        <div><b>LRA</b><span>Loudness range, EBU Tech 3342: P95 − P10 of short-term loudness after a −20 LU gate.</span></div>
+        <div><b>True peak</b><span>4× oversampled inter-sample peak in dBTP. Ceiling is usually −1.0 dBTP.</span></div>
+        <div><b>PLR / PSR</b><span>Peak-to-loudness and peak-to-short-term ratio: how much crest factor the mix keeps.</span></div>
+      </div>
+      <div class="keys">
+        <div><kbd>Space</kbd> play / pause</div>
+        <div><kbd>O</kbd> open file</div>
+        <div><kbd>L</kbd> live input</div>
+        <div><kbd>R</kbd> reset</div>
+        <div><kbd>E</kbd> export report</div>
+        <div><kbd>?</kbd> this panel</div>
+      </div>
+      <p class="fine">Drag on the timeline to measure a section. Everything runs locally — no audio leaves this machine.
+      <b>System audio</b> meters whatever the PC plays (Audacity, a browser tab, Spotify): pick “Entire screen” in the
+      share dialog and tick “Share system audio”. Both live modes need the desktop shortcut, because browsers only
+      expose microphones and loopback on <code>http://localhost</code>.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/*__CORE__*/
+</script>
+<script>
+/*__APP__*/
+</script>
+</body>
+</html>

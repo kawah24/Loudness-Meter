@@ -1,0 +1,17 @@
+{
+  "name": "loudness-meter",
+  "version": "1.0.0",
+  "description": "ITU-R BS.1770-4 / EBU R128 loudness meter in one HTML file",
+  "main": "build.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "node build.js",
+    "verify": "node tests/verify.js",
+    "ui-test": "node tests/ui-test.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1"
+  },
+  "license": "ISC",
+  "private": true
+}
