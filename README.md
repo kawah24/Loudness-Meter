@@ -70,6 +70,8 @@ true-peak cell turns red.
   Spotify). System audio goes through Chrome's share dialog: pick “Entire screen” and tick
   “Share system audio”.
 - **Metadata** — edit or strip the container tags without touching the audio.
+- **Themes** — six palettes (Amber, Songframe, Brandl, Sunset, Ocean, Mono) recolour the
+  whole instrument, charts included; the choice is remembered between sessions.
 - **Auto-fix** — brings a file to the target: gain, then a look-ahead limiter at the
   ceiling, then re-measures and exports a 24-bit WAV. See below.
 - **Window** — `ALL` / `10 s` / `30 s`; the short windows follow the playhead, or the end
@@ -245,11 +247,6 @@ needed for the Playwright UI tests — the meter itself has no dependencies at a
   timeline header — a paused source should never look like a broken meter.
 - Numbers are shown to 0.1 with no ballistics smoothing — what you see is the block value,
   not a decayed display.
-
-## Support
-
-If this saves you time, you can [buy me a coffee on Ko-fi](https://ko-fi.com/rockhouse).
-No account, no nag screen — the tool stays free and MIT either way.
 
 ## License
 

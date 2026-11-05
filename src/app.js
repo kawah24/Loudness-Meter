@@ -23,6 +23,62 @@
     textDim: '#8b95a7'
   };
 
+  const THEMES = [
+    { id: 'amber', name: 'Amber', i: '#ffb545', m: '#e2603f', s: '#5b9bf3' },
+    { id: 'songframe', name: 'Songframe', i: '#f06ab0', m: '#ff6f91', s: '#9b7bff' },
+    { id: 'brandl', name: 'Brandl', i: '#2fd3cb', m: '#ff9a4d', s: '#4aa8e0' },
+    { id: 'sunset', name: 'Sunset', i: '#ff8a4c', m: '#ff4f6d', s: '#ffc247' },
+    { id: 'ocean', name: 'Ocean', i: '#58a6ff', m: '#ff8664', s: '#58a6ff' },
+    { id: 'mono', name: 'Mono', i: '#e8ecf4', m: '#aab3c2', s: '#6f7b8d' }
+  ];
+
+  let accentHex = '#ffb545';
+
+  /** "rgba()" from the current accent, for canvas washes. */
+  function accentAlpha(a) {
+    const h = accentHex.replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
+  function applyTheme(id, remember) {
+    const theme = THEMES.find((t) => t.id === id) || THEMES[0];
+    accentHex = theme.i;
+    COL.i = theme.i;
+    COL.m = theme.m;
+    COL.s = theme.s;
+    document.body.dataset.theme = theme.id;
+    if (remember !== false) {
+      try { localStorage.setItem('lm-theme', theme.id); } catch (e) {}
+    }
+    document.querySelectorAll('.theme-item').forEach((el) => {
+      el.classList.toggle('is-active', el.dataset.theme === theme.id);
+      const check = el.querySelector('.theme-check');
+      if (check) check.textContent = el.dataset.theme === theme.id ? '\u2713' : '';
+    });
+  }
+
+  function buildThemeMenu() {
+    const menu = $('themeMenu');
+    if (!menu) return;
+    THEMES.forEach((t) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'theme-item';
+      btn.dataset.theme = t.id;
+      btn.innerHTML = '<span class="theme-dots"><i style="background:' + t.i + '"></i>' +
+        '<i style="background:' + t.s + '"></i></span>' +
+        '<span class="theme-name">' + t.name + '</span><span class="theme-check"></span>';
+      btn.addEventListener('click', () => {
+        applyTheme(t.id);
+        menu.hidden = true;
+      });
+      menu.appendChild(btn);
+    });
+  }
+
   const TARGETS = [
     { id: 'spotify', label: 'Spotify / YouTube   −14', il: -14, tp: -1.0 },
     { id: 'apple', label: 'Apple Music   −16', il: -16, tp: -1.0 },
@@ -190,14 +246,14 @@
     // target marker
     if (t && t.il !== null) {
       const y = lufsToY(t.il, padTop, plotH);
-      ctx.strokeStyle = 'rgba(255,181,69,0.55)';
+      ctx.strokeStyle = accentAlpha(0.55);
       ctx.setLineDash([3, 3]);
       ctx.beginPath();
       ctx.moveTo(6, Math.round(y) + 0.5);
       ctx.lineTo(axisX, Math.round(y) + 0.5);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(255,181,69,0.85)';
+      ctx.fillStyle = accentAlpha(0.85);
       ctx.beginPath();
       ctx.moveTo(4, y - 3);
       ctx.lineTo(9, y);
@@ -393,7 +449,7 @@
     // target line
     if (state.target && state.target.il !== null) {
       const y = lufsToY(state.target.il, padTop, plotH);
-      ctx.strokeStyle = 'rgba(255,181,69,0.4)';
+      ctx.strokeStyle = accentAlpha(0.4);
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       ctx.moveTo(0, Math.round(y) + 0.5);
@@ -405,7 +461,7 @@
     // integrated line
     if (vals && isNum(vals.integrated)) {
       const y = lufsToY(vals.integrated, padTop, plotH);
-      ctx.strokeStyle = 'rgba(255,181,69,0.9)';
+      ctx.strokeStyle = accentAlpha(0.9);
       ctx.lineWidth = 1.4;
       ctx.setLineDash([7, 4]);
       ctx.beginPath();
@@ -490,7 +546,7 @@
     // target
     if (state.target && state.target.il !== null) {
       const y = lufsToY(state.target.il, padTop, plotH);
-      ctx.strokeStyle = 'rgba(255,181,69,0.32)';
+      ctx.strokeStyle = accentAlpha(0.32);
       ctx.setLineDash([5, 5]);
       ctx.beginPath();
       ctx.moveTo(padL, Math.round(y) + 0.5);
@@ -567,7 +623,7 @@
     const vals = state.values;
     if (vals && isNum(vals.integrated)) {
       const y = lufsToY(vals.integrated, padTop, plotH);
-      ctx.strokeStyle = 'rgba(255,181,69,0.75)';
+      ctx.strokeStyle = accentAlpha(0.75);
       ctx.lineWidth = 1;
       ctx.setLineDash([6, 5]);
       ctx.beginPath();
@@ -607,7 +663,7 @@
 
     // -1 dBTP reference
     const tpY = stripY + (1 / 36) * (stripH - 2);
-    ctx.strokeStyle = 'rgba(255,181,69,0.35)';
+    ctx.strokeStyle = accentAlpha(0.35);
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
     ctx.moveTo(padL, Math.round(tpY) + 0.5);
@@ -640,9 +696,9 @@
       const b = Math.max(state.selection.a, state.selection.b);
       const xa = xOf(a);
       const xb = xOf(b);
-      ctx.fillStyle = 'rgba(255,181,69,0.1)';
+      ctx.fillStyle = accentAlpha(0.1);
       ctx.fillRect(xa, padTop, xb - xa, plotH);
-      ctx.strokeStyle = 'rgba(255,181,69,0.6)';
+      ctx.strokeStyle = accentAlpha(0.6);
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(Math.round(xa) + 0.5, padTop);
@@ -2020,6 +2076,13 @@
     $('metaStrip').addEventListener('click', () => saveMeta(true));
     $('btnReset').addEventListener('click', resetMeasurement);
     $('btnExport').addEventListener('click', exportReport);
+    $('btnTheme').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      $('themeMenu').hidden = !$('themeMenu').hidden;
+    });
+    document.addEventListener('click', (ev) => {
+      if (!ev.target.closest('.theme-wrap')) $('themeMenu').hidden = true;
+    });
     $('btnHelp').addEventListener('click', toggleHelp);
     $('btnCloseHelp').addEventListener('click', toggleHelp);
     $('helpModal').addEventListener('click', (ev) => {
@@ -2062,6 +2125,10 @@
 
   function boot() {
     unitNodes = Array.prototype.slice.call(document.querySelectorAll('.cell .u'));
+    buildThemeMenu();
+    let savedTheme = 'amber';
+    try { savedTheme = localStorage.getItem('lm-theme') || 'amber'; } catch (e) {}
+    applyTheme(savedTheme, false);
     initTargets();
     initButtons();
     initGraphInteraction();
