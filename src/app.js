@@ -2006,6 +2006,7 @@
           $('helpModal').hidden = true;
           $('fixModal').hidden = true;
           $('metaModal').hidden = true;
+          $('aboutModal').hidden = true;
           state.selection = null;
           updateSelectionChip();
           break;
@@ -2082,6 +2083,11 @@
     });
     document.addEventListener('click', (ev) => {
       if (!ev.target.closest('.theme-wrap')) $('themeMenu').hidden = true;
+    });
+    $('btnAbout').addEventListener('click', () => { $('aboutModal').hidden = false; });
+    $('btnCloseAbout').addEventListener('click', () => { $('aboutModal').hidden = true; });
+    $('aboutModal').addEventListener('click', (ev) => {
+      if (ev.target === $('aboutModal')) $('aboutModal').hidden = true;
     });
     $('btnHelp').addEventListener('click', toggleHelp);
     $('btnCloseHelp').addEventListener('click', toggleHelp);

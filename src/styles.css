@@ -634,6 +634,70 @@ kbd {
 .fine code { font-family: var(--mono); color: var(--dim); }
 
 
+/* ---------------- about ---------------- */
+
+.about-card { width: min(470px, 100%); }
+
+.about-body { text-align: center; padding-top: 18px; }
+
+.about-mark {
+  width: 42px; height: 42px;
+  fill: var(--i);
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--i) 35%, transparent));
+  margin-bottom: 8px;
+}
+
+.about-body h3 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: .04em;
+  font-weight: 600;
+  color: var(--txt);
+}
+
+.about-sub {
+  margin: 4px 0 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  color: var(--faint);
+}
+
+.about-by { margin: 0 0 16px; font-size: 11.5px; color: var(--dim); }
+.about-by a { color: var(--i); text-decoration: none; }
+.about-by a:hover { text-decoration: underline; }
+
+.about-links { display: grid; gap: 8px; margin-bottom: 16px; }
+
+.about-links a {
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #0c1016;
+  color: var(--i);
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-align: left;
+  line-height: 1.5;
+}
+.about-links a span {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--dim);
+  margin-bottom: 1px;
+}
+.about-links a:hover { border-color: color-mix(in srgb, var(--i) 50%, transparent); background: color-mix(in srgb, var(--i) 6%, #0c1016); }
+
+.about-note {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.55;
+  color: var(--faint);
+}
+
 /* ---------------- themes ---------------- */
 
 body[data-theme="songframe"] { --i: #f06ab0; --m: #ff6f91; --s: #9b7bff; }

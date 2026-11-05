@@ -61,6 +61,7 @@
           <div class="theme-title">THEME</div>
         </div>
       </span>
+      <button class="btn btn-icon" id="btnAbout" title="About" aria-label="About">i</button>
       <button class="btn btn-icon" id="btnHelp" title="Reference &amp; shortcuts (?)" aria-label="Help">?</button>
     </div>
   </header>
@@ -250,6 +251,42 @@
       <p class="fine">Only the container's metadata is rewritten — the audio payload is copied byte for byte,
       so a WAV stays sample-identical and an MP3/FLAC keeps its original frames. “Strip all” removes
       BWF/bext, iXML, XMP, ID3, APE and cover art.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="aboutModal" hidden>
+  <div class="modal-card about-card">
+    <header>
+      <h2>ABOUT</h2>
+      <button class="btn btn-icon" id="btnCloseAbout" aria-label="Close">&times;</button>
+    </header>
+    <div class="modal-body about-body">
+      <svg class="about-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3"  y="12" width="3" height="8"  rx="1.5" opacity=".45"/>
+        <rect x="9"  y="7"  width="3" height="18" rx="1.5" opacity=".7"/>
+        <rect x="15" y="2"  width="3" height="28" rx="1.5"/>
+        <rect x="21" y="9"  width="3" height="14" rx="1.5" opacity=".7"/>
+        <rect x="27" y="13" width="3" height="6"  rx="1.5" opacity=".45"/>
+      </svg>
+      <h3>Loudness Meter</h3>
+      <p class="about-sub">version 1.1.0 &middot; MIT licence</p>
+      <p class="about-by">made by <a href="https://github.com/kawah24" target="_blank" rel="noopener">kawah24</a></p>
+
+      <div class="about-links">
+        <a href="https://github.com/kawah24/Loudness-Meter" target="_blank" rel="noopener">
+          <span>Source, issues and the changelog</span>
+          github.com/kawah24/Loudness-Meter
+        </a>
+        <a href="https://kawah24.github.io/Loudness-Meter/" target="_blank" rel="noopener">
+          <span>Hosted copy — open it on any machine</span>
+          kawah24.github.io/Loudness-Meter
+        </a>
+      </div>
+
+      <p class="about-note">ITU-R BS.1770-4 and EBU R128 measurement, verified to 0.05 LU against
+      libebur128 and 0.11 dB of true peak against exact interpolation. Everything runs in your
+      browser: no account, no telemetry, no audio leaves this machine.</p>
     </div>
   </div>
 </div>
