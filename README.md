@@ -246,6 +246,11 @@ needed for the Playwright UI tests — the meter itself has no dependencies at a
 - Numbers are shown to 0.1 with no ballistics smoothing — what you see is the block value,
   not a decayed display.
 
+## Support
+
+If this saves you time, you can [buy me a coffee on Ko-fi](https://ko-fi.com/rockhouse).
+No account, no nag screen — the tool stays free and MIT either way.
+
 ## License
 
 MIT — use it, fork it, ship it inside a commercial product. The only obligation is keeping
