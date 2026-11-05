@@ -245,3 +245,9 @@ needed for the Playwright UI tests — the meter itself has no dependencies at a
   timeline header — a paused source should never look like a broken meter.
 - Numbers are shown to 0.1 with no ballistics smoothing — what you see is the block value,
   not a decayed display.
+
+## License
+
+MIT — use it, fork it, ship it inside a commercial product. The only obligation is keeping
+the copyright notice. The bundled `LoudnessMeter.html` carries the same notice in its header,
+so a single copied file keeps its licence. See [LICENSE](LICENSE).

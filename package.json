@@ -12,6 +12,6 @@
   "devDependencies": {
     "playwright": "^1.64.1"
   },
-  "license": "ISC",
+  "license": "MIT",
   "private": true
 }
